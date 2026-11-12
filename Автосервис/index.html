@@ -76,11 +76,12 @@ h1,h2,h3{color:var(--ink);font-weight:800;line-height:1.15;text-transform:upperc
 .hero-tag::after{content:"";display:block;width:22px;height:2px;background:var(--red);margin-top:10px}
 img[width]{width:100%;height:auto}
 .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center;gap:30px;padding-top:70px}
-.hero-car{margin-left:40px;transition:opacity .35s,transform .35s}
-.hero-car.fade{opacity:0;transform:translateX(-20px)}
+.hero-car{transition:opacity .4s,transform .5s var(--ease,ease)}
+.hero-car.fade{opacity:0;transform:translateX(-30px)}
 .hero-text .eyebrow{margin-bottom:10px}
 .hero-text h1{font-size:clamp(30px,3.7vw,46px);font-weight:900;letter-spacing:.01em}
-.hero-text h1 span{display:block;font-weight:500}
+.hero-text h1 span{display:block}
+.hero-text .line>.btn{display:inline-flex}
 .hero-text p{max-width:380px;margin:34px 0 38px;font-size:13px;line-height:1.75}
 .hero-slide{transition:opacity .35s}
 .hero-slide.fade{opacity:0}
@@ -116,7 +117,7 @@ img[width]{width:100%;height:auto}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .card{background:var(--bg-soft);border-radius:10px;overflow:hidden;position:relative;transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px -20px rgba(0,0,0,.35)}
-.card-img{aspect-ratio:186/117;overflow:hidden}
+.card-img{aspect-ratio:186/90;overflow:hidden}
 .card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
 .card:hover .card-img img{transform:scale(1.06)}
 .card-ico{width:50px;height:50px;border-radius:12px;background:#fff;display:grid;place-items:center;margin:-25px 0 0 16px;position:relative;box-shadow:0 6px 16px -8px rgba(0,0,0,.25)}
@@ -168,9 +169,89 @@ img[width]{width:100%;height:auto}
 .footer .logo{color:#fff}
 .footer .socials a{color:#fff}
 
-/* ---------- reveal ---------- */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+:root{--ease:cubic-bezier(.22,1,.36,1)}
+
+/* scroll progress */
+.progress{position:fixed;top:0;left:0;height:3px;width:100%;background:var(--red);transform-origin:0 50%;transform:scaleX(0);z-index:60;pointer-events:none}
+
+/* reveal on scroll — variants */
+.reveal{opacity:0;transition:opacity .9s var(--ease),transform .9s var(--ease),clip-path 1.1s var(--ease);transition-delay:var(--d,0s)}
+.reveal,.reveal[data-a="up"]{transform:translateY(40px)}
+.reveal[data-a="left"]{transform:translateX(-60px)}
+.reveal[data-a="right"]{transform:translateX(80px)}
+.reveal[data-a="zoom"]{transform:scale(.92)}
+.reveal[data-a="drive"]{transform:translateX(35%)}
 .reveal.in{opacity:1;transform:none}
+.reveal.done{transition:opacity .3s,transform .3s var(--ease),box-shadow .3s;transition-delay:0s}
+
+/* hero intro (runs once on load) */
+.hero-strip{transform-origin:50% 0;animation:stripIn 1.2s var(--ease) both}
+.hero-num{animation:fadeUp 1s .2s var(--ease) both}
+.hero-tag{animation:fadeUp 1s .45s var(--ease) both}
+.hero-rail{animation:fadeIn 1.2s .6s both}
+.hero-text .line{display:block;overflow:hidden}
+.hero-text .line>*{display:block;animation:lineUp 1s var(--ease) both;animation-delay:var(--d)}
+.hero-bottom>*{animation:fadeUp .9s var(--ease) both;animation-delay:calc(1.1s + var(--i,0) * .12s)}
+@keyframes stripIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes lineUp{from{transform:translateY(105%)}to{transform:none}}
+
+/* car: drive in + idle float + glossy shine sweep */
+.car-wrap{position:relative;margin-left:40px;will-change:transform}
+.car-wrap .hero-car{margin:0}
+.car-drive{animation:driveIn 1.6s .25s var(--ease) both}
+@keyframes driveIn{0%{opacity:0;transform:translateX(-140px);filter:blur(6px)}60%{filter:blur(0)}100%{opacity:1;transform:none}}
+.car-float{animation:float 6s 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.shine{position:absolute;inset:0;pointer-events:none;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.shine::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.75) 48%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.75) 52%,transparent 65%);background-size:250% 100%;background-position:150% 0;mix-blend-mode:soft-light;animation:shine 5.5s 2.2s ease-in-out infinite}
+@keyframes shine{0%{background-position:150% 0}35%,100%{background-position:-50% 0}}
+.car-shadow{position:absolute;left:8%;right:6%;bottom:2%;height:9%;background:radial-gradient(closest-side,rgba(0,0,0,.28),transparent);filter:blur(6px);z-index:-1;animation:shadowPulse 6s 2s ease-in-out infinite}
+@keyframes shadowPulse{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.94);opacity:.75}}
+
+/* slider transitions */
+.hero-slide.fade{opacity:0;transform:translateY(12px)}
+.hero-slide{transition:opacity .4s,transform .4s var(--ease)}
+
+/* button: light sweep + pulse ring */
+.btn{position:relative;overflow:hidden;isolation:isolate}
+.btn::before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);transition:left .6s var(--ease);z-index:-1}
+.btn:hover::before{left:130%}
+.btn:active{transform:scale(.97)}
+.pulse{overflow:visible}
+.pulse::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 rgba(227,19,27,.55);animation:pulse 2.4s 2.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(227,19,27,.5)}70%,100%{box-shadow:0 0 0 16px rgba(227,19,27,0)}}
+
+/* about image: wipe reveal + slow zoom */
+.about-img{clip-path:inset(0 0 0 100%);transition:clip-path 1.3s var(--ease)}
+.about-img.in{clip-path:inset(0 0 0 0)}
+.about-img img{transform:scale(1.15);transition:transform 2.4s var(--ease)}
+.about-img.in img{transform:scale(1)}
+
+/* cards & icons */
+.card .card-ico{transition:transform .5s var(--ease)}
+.card:hover .card-ico{transform:translateY(-4px) rotate(-6deg)}
+.card.in .card-ico{animation:pop .7s var(--ease) backwards;animation-delay:calc(var(--d,0s) + .35s)}
+@keyframes pop{0%{transform:scale(0) rotate(-30deg)}100%{transform:none}}
+.adv-ico{transition:background .3s,color .3s,transform .4s var(--ease)}
+.adv-list li:hover .adv-ico{background:var(--red);transform:scale(1.08)}
+.adv-list li:hover .adv-ico svg{color:#fff}
+
+/* social icons */
+.socials a:hover{transform:translateY(-3px)}
+
+/* section numbers parallax hook */
+[data-parallax]{will-change:transform}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1!important;transform:none!important}
+  .about-img{clip-path:none}
+}
 
 /* ---------- responsive ---------- */
 @media (max-width:1024px){
@@ -195,7 +276,7 @@ img[width]{width:100%;height:auto}
   .hero-tag{left:106px;top:20px}
   .hero .wrap{min-height:0}
   .hero-grid{grid-template-columns:1fr;padding-top:90px;gap:20px}
-  .hero-car{margin-left:0}
+  .car-wrap{margin-left:0}
   .hero-bottom{grid-template-columns:1fr 1fr 1fr;row-gap:24px}
   .hero-bottom .socials{grid-column:1/-1;order:2}
   .slider-ctl{display:none}
@@ -217,10 +298,10 @@ img[width]{width:100%;height:auto}
   .hero-bottom{grid-template-columns:1fr}
   .form{padding:24px}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 
 <!-- ============ HEADER ============ -->
 <header class="header" id="top">
@@ -249,19 +330,27 @@ img[width]{width:100%;height:auto}
     <div class="hero-tag">Детейлинг<br>с заботой</div>
 
     <div class="hero-grid">
-      <img class="hero-car" id="heroCar" src="images/hero-car.png" alt="Daewoo Matiz после детейлинга" width="850" height="600">
+      <div class="car-wrap" id="carWrap" data-tilt>
+        <div class="car-drive">
+          <div class="car-float">
+            <span class="car-shadow"></span>
+            <img class="hero-car" id="heroCar" src="images/hero-car-sm.webp" srcset="images/hero-car-sm.webp 850w, images/hero-car-lg.webp 1700w" sizes="(max-width:860px) 100vw, 640px" alt="Daewoo Matiz после детейлинга" width="850" height="600" fetchpriority="high">
+            <span class="shine" id="carShine"></span>
+          </div>
+        </div>
+      </div>
       <div class="hero-text">
         <div class="hero-slide" id="heroSlide">
-          <div class="eyebrow" id="sEyebrow">Чистота. Блеск. Защита.</div>
-          <h1 id="sTitle">Детейлинг<span>вашего Matiz</span></h1>
-          <p id="sText">Профессиональный уход за автомобилем, который подчеркивает его стиль и продлевает срок службы.</p>
+          <span class="line"><span class="eyebrow" id="sEyebrow" style="--d:.5s">Чистота. Блеск. Защита.</span></span>
+          <h1 id="sTitle"><span class="line"><span style="--d:.62s" id="sT1">Детейлинг</span></span><span class="line"><span style="--d:.74s;font-weight:500" id="sT2">вашего Matiz</span></span></h1>
+          <span class="line"><p id="sText" style="--d:.9s">Профессиональный уход за автомобилем, который подчеркивает его стиль и продлевает срок службы.</p></span>
         </div>
-        <a href="#contacts" class="btn btn-red">Записаться на услугу <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <span class="line" style="padding:0 20px 20px 0;margin:0 -20px -20px 0"><a href="#contacts" class="btn btn-red pulse" style="--d:1.05s">Записаться на услугу <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></span>
       </div>
     </div>
 
     <div class="hero-bottom">
-      <div class="socials">
+      <div class="socials" style="--i:0">
         <!-- WhatsApp -->
         <a href="https://www.whatsapp.com" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37A9.86 9.86 0 0 1 2.15 12C2.15 6.55 6.59 2.12 12.05 2.12c2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 7c0 5.45-4.44 9.89-9.89 9.89zm8.41-18.3A11.82 11.82 0 0 0 12.04 0C5.5 0 .16 5.33.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.18-1.24-6.17-3.49-8.4z"/></svg>
@@ -275,10 +364,10 @@ img[width]{width:100%;height:auto}
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.94 4.3 18.9 18.65c-.23 1.01-.83 1.26-1.68.79l-4.63-3.41-2.23 2.15c-.25.25-.45.45-.93.45l.33-4.71 8.58-7.75c.37-.33-.08-.52-.58-.19L7.16 12.66l-4.57-1.43c-.99-.31-1.01-.99.21-1.47L20.65 2.9c.83-.31 1.55.19 1.29 1.4z"/></svg>
         </a>
       </div>
-      <div class="stat"><small>более</small><b>5 лет</b><em>опыта работы</em></div>
-      <div class="stat"><small>более</small><b>1000</b><em>довольных клиентов</em></div>
-      <div class="stat"><small>&nbsp;</small><b>100%</b><em>гарантия качества</em></div>
-      <div class="slider-ctl">
+      <div class="stat" style="--i:1"><small>более</small><b><span data-count="5">5</span> лет</b><em>опыта работы</em></div>
+      <div class="stat" style="--i:2"><small>более</small><b data-count="1000">1000</b><em>довольных клиентов</em></div>
+      <div class="stat" style="--i:3"><small>&nbsp;</small><b><span data-count="100">100</span>%</b><em>гарантия качества</em></div>
+      <div class="slider-ctl" style="--i:4">
         <button id="prev" aria-label="Предыдущий слайд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg></button>
         <span><span class="cur" id="cur">1</span> / 4</span>
         <button id="next" aria-label="Следующий слайд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></button>
@@ -290,74 +379,74 @@ img[width]{width:100%;height:auto}
 <!-- ============ 02 ABOUT ============ -->
 <section class="sec about" id="about">
   <div class="wrap">
-    <div class="sec-num">02</div>
-    <div class="about-text reveal">
+    <div class="sec-num" data-parallax=".25">02</div>
+    <div class="about-text reveal" data-a="left">
       <div class="eyebrow">О детейлинге</div>
       <h2 class="h2">Детейлинг —<br>это не роскошь,<br>а забота о вашем авто</h2>
       <p>Регулярный профессиональный уход помогает сохранить внешний вид, защитить кузов и салон от износа, продлить срок службы автомобиля и поддерживать его в идеальном состоянии.</p>
       <a href="#services" class="btn btn-red">Подробнее <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
   </div>
-  <div class="about-img"><img src="images/about.jpg" alt="Полировка фары микрофиброй" loading="lazy"></div>
+  <div class="about-img" data-reveal><img src="images/about-sm.webp" srcset="images/about-sm.webp 800w, images/about-lg.webp 1600w" sizes="(max-width:860px) 100vw, 50vw" alt="Полировка фары микрофиброй" loading="lazy" decoding="async"></div>
 </section>
 
 <!-- ============ 03 SERVICES ============ -->
 <section class="sec services" id="services">
   <div class="wrap">
-    <div class="sec-num">03</div>
-    <div class="services-head reveal">
+    <div class="sec-num" data-parallax=".25">03</div>
+    <div class="services-head reveal" data-a="left">
       <div class="eyebrow">Наши услуги</div>
       <h2 class="h2">Полный комплекс<br>для вашего авто</h2>
     </div>
     <div class="cards">
-      <article class="card reveal">
-        <div class="card-img"><img src="images/service-1.jpg" alt="Мойка кузова" loading="lazy"></div>
+      <article class="card reveal" style="--d:0.00s">
+        <div class="card-img"><img src="images/service-1-sm.webp" srcset="images/service-1-sm.webp 400w, images/service-1-lg.webp 740w" sizes="(max-width:520px) 100vw, (max-width:860px) 50vw, 280px" decoding="async" alt="Мойка кузова" loading="lazy"></div>
         <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-4l-2-5H7l-2 5z"/><path d="M5 13h14M7.5 15.5h.01M16.5 15.5h.01M6 17v2M18 17v2"/><path d="M9 4c0 1-1 1.5-1 2.3a1 1 0 0 0 2 0C10 5.5 9 5 9 4zM15 3c0 1-1 1.5-1 2.3a1 1 0 0 0 2 0C16 4.5 15 4 15 3z"/></svg></div>
         <div class="card-body"><h3>Мойка</h3><p>Деликатная мойка кузова и дисков с использованием премиум-химии.</p></div>
       </article>
-      <article class="card reveal">
-        <div class="card-img"><img src="images/service-2.jpg" alt="Полировка кузова" loading="lazy"></div>
+      <article class="card reveal" style="--d:0.12s">
+        <div class="card-img"><img src="images/service-2-sm.webp" srcset="images/service-2-sm.webp 400w, images/service-2-lg.webp 740w" sizes="(max-width:520px) 100vw, (max-width:860px) 50vw, 280px" decoding="async" alt="Полировка кузова" loading="lazy"></div>
         <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><circle cx="12" cy="14" r="2.5"/><path d="M12 8V4h4M18 8l2-2M6 8 4 6"/></svg></div>
         <div class="card-body"><h3>Полировка</h3><p>Устранение царапин, восстановление блеска и глубины цвета.</p></div>
       </article>
-      <article class="card reveal">
-        <div class="card-img"><img src="images/service-3.jpg" alt="Керамическое покрытие" loading="lazy"></div>
+      <article class="card reveal" style="--d:0.24s">
+        <div class="card-img"><img src="images/service-3-sm.webp" srcset="images/service-3-sm.webp 400w, images/service-3-lg.webp 740w" sizes="(max-width:520px) 100vw, (max-width:860px) 50vw, 280px" decoding="async" alt="Керамическое покрытие" loading="lazy"></div>
         <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6z"/><path d="M12 9c0 1.5-2 2.3-2 3.8a2 2 0 0 0 4 0C14 11.3 12 10.5 12 9z"/></svg></div>
         <div class="card-body"><h3>Керамика</h3><p>Надежная защита кузова от внешних воздействий и ультрафиолета.</p></div>
       </article>
-      <article class="card reveal">
-        <div class="card-img"><img src="images/service-4.jpg" alt="Химчистка салона" loading="lazy"></div>
+      <article class="card reveal" style="--d:0.36s">
+        <div class="card-img"><img src="images/service-4-sm.webp" srcset="images/service-4-sm.webp 400w, images/service-4-lg.webp 740w" sizes="(max-width:520px) 100vw, (max-width:860px) 50vw, 280px" decoding="async" alt="Химчистка салона" loading="lazy"></div>
         <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="3.5"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="3.5"/></svg></div>
         <div class="card-body"><h3>Химчистка</h3><p>Глубокая очистка салона с восстановлением его первозданного вида.</p></div>
       </article>
     </div>
-    <div class="center"><a href="#contacts" class="btn btn-line">Смотреть все услуги <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="center reveal"><a href="#contacts" class="btn btn-line">Смотреть все услуги <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
   </div>
 </section>
 
 <!-- ============ 04 ADVANTAGES ============ -->
 <section class="sec adv" id="advantages">
   <div class="wrap">
-    <div class="sec-num">04</div>
-    <div class="adv-text reveal">
+    <div class="sec-num" data-parallax=".25">04</div>
+    <div class="adv-text reveal" data-a="left">
       <div class="eyebrow">Почему выбирают нас</div>
       <h2 class="h2">Преимущества<br>работы с нами</h2>
       <ul class="adv-list">
-        <li><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18M6 3l3 6M18 3l-3 6"/></svg></span><div><h4>Профессионализм</h4><p>Опытные мастера с профильным обучением и любовью к деталям.</p></div></li>
-        <li><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h4>Качество</h4><p>Используем только проверенные материалы и оборудование.</p></div></li>
-        <li><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/></svg></span><div><h4>Экономия времени</h4><p>Работаем быстро и качественно, ценим ваше время.</p></div></li>
-        <li><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><div><h4>Гарантия</h4><p>Предоставляем гарантию на все виды работ и материалы.</p></div></li>
+        <li class="reveal" data-a="left" style="--d:0.15s"><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18M6 3l3 6M18 3l-3 6"/></svg></span><div><h4>Профессионализм</h4><p>Опытные мастера с профильным обучением и любовью к деталям.</p></div></li>
+        <li class="reveal" data-a="left" style="--d:0.27s"><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h4>Качество</h4><p>Используем только проверенные материалы и оборудование.</p></div></li>
+        <li class="reveal" data-a="left" style="--d:0.39s"><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/></svg></span><div><h4>Экономия времени</h4><p>Работаем быстро и качественно, ценим ваше время.</p></div></li>
+        <li class="reveal" data-a="left" style="--d:0.51s"><span class="adv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><div><h4>Гарантия</h4><p>Предоставляем гарантию на все виды работ и материалы.</p></div></li>
       </ul>
     </div>
-    <img class="adv-car reveal" src="images/rear-car.png" alt="Daewoo Matiz, вид сзади" loading="lazy" width="886" height="640">
+    <img class="adv-car reveal" data-a="drive" src="images/rear-car-sm.webp" srcset="images/rear-car-sm.webp 850w, images/rear-car-lg.webp 1700w" sizes="(max-width:860px) 100vw, 640px" alt="Daewoo Matiz, вид сзади" loading="lazy" decoding="async" width="850" height="614">
   </div>
 </section>
 
 <!-- ============ 05 CONTACTS ============ -->
 <section class="sec contacts" id="contacts">
   <div class="wrap">
-    <div class="sec-num">05</div>
-    <div class="contacts-info reveal">
+    <div class="sec-num" data-parallax=".25">05</div>
+    <div class="contacts-info reveal" data-a="left">
       <div class="eyebrow">Контакты</div>
       <h2 class="h2">Запишитесь<br>на детейлинг</h2>
       <p>Напишите нам в удобный мессенджер или оставьте заявку — перезвоним в течение 15 минут.</p>
@@ -371,7 +460,7 @@ img[width]{width:100%;height:auto}
         <a href="https://vk.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.79 17.3c-5.47 0-8.59-3.75-8.72-9.99h2.74c.09 4.58 2.11 6.52 3.71 6.92V7.31h2.58v3.950c1.58-.17 3.240-1.97 3.8-3.95h2.58a7.62 7.62 0 0 1-3.51 4.98 7.9 7.9 0 0 1 4.11 5.01h-2.84a4.94 4.94 0 0 0-4.14-3.57v3.57h-.31z"/></svg>ВКонтакте</a>
       </div>
     </div>
-    <form class="form reveal" id="form">
+    <form class="form reveal" data-a="right" id="form">
       <h3>Онлайн-запись</h3>
       <label for="f-name">Имя</label>
       <input id="f-name" name="name" required placeholder="Как к вам обращаться">
@@ -411,31 +500,81 @@ nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.clas
 
 // hero slider (text slides)
 const slides=[
-  {e:'Чистота. Блеск. Защита.',t:'Детейлинг<span>вашего Matiz</span>',p:'Профессиональный уход за автомобилем, который подчеркивает его стиль и продлевает срок службы.'},
-  {e:'Мойка. Полировка.',t:'Блеск<span>как из салона</span>',p:'Восстанавливаем глубину цвета и убираем мелкие царапины — кузов снова выглядит как новый.'},
-  {e:'Керамика. Защита.',t:'Защита<span>на годы вперёд</span>',p:'Керамическое покрытие бережёт кузов от реагентов, грязи и ультрафиолета.'},
-  {e:'Химчистка. Уют.',t:'Свежий салон<span>без пятен и запахов</span>',p:'Глубокая очистка сидений, потолка и ковров — возвращаем салону первозданный вид.'}
+  {e:'Чистота. Блеск. Защита.',t1:'Детейлинг',t2:'вашего Matiz',p:'Профессиональный уход за автомобилем, который подчеркивает его стиль и продлевает срок службы.'},
+  {e:'Мойка. Полировка.',t1:'Блеск',t2:'как из салона',p:'Восстанавливаем глубину цвета и убираем мелкие царапины — кузов снова выглядит как новый.'},
+  {e:'Керамика. Защита.',t1:'Защита',t2:'на годы вперёд',p:'Керамическое покрытие бережёт кузов от реагентов, грязи и ультрафиолета.'},
+  {e:'Химчистка. Уют.',t1:'Свежий салон',t2:'без пятен и запахов',p:'Глубокая очистка сидений, потолка и ковров — возвращаем салону первозданный вид.'}
 ];
-let i=0;
-const box=document.getElementById('heroSlide'),car=document.getElementById('heroCar');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id);
+let i=0,timer;
+const box=$('heroSlide'),car=$('heroCar');
 function go(n){
   i=(n+slides.length)%slides.length;
   box.classList.add('fade');car.classList.add('fade');
   setTimeout(()=>{
     const s=slides[i];
-    document.getElementById('sEyebrow').textContent=s.e;
-    document.getElementById('sTitle').innerHTML=s.t;
-    document.getElementById('sText').textContent=s.p;
-    document.getElementById('cur').textContent=i+1;
+    $('sEyebrow').textContent=s.e;$('sT1').textContent=s.t1;$('sT2').textContent=s.t2;$('sText').textContent=s.p;
+    $('cur').textContent=i+1;
     box.classList.remove('fade');car.classList.remove('fade');
-  },350);
+  },400);
+  restart();
 }
-document.getElementById('prev').onclick=()=>go(i-1);
-document.getElementById('next').onclick=()=>go(i+1);
+function restart(){clearInterval(timer);if(!reduce)timer=setInterval(()=>go(i+1),7000)}
+$('prev').onclick=()=>go(i-1);
+$('next').onclick=()=>go(i+1);
+setTimeout(restart,2500);
 
-// reveal on scroll
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+// glossy shine is masked by the car's own silhouette
+const shine=$('carShine');
+function setMask(){const u=`url("${car.currentSrc||car.src}")`;shine.style.webkitMaskImage=u;shine.style.maskImage=u}
+car.complete?setMask():car.addEventListener('load',setMask);
+
+// reveal on scroll (+ counters)
+function count(el){
+  const to=+el.dataset.count,dur=1600,t0=performance.now();
+  (function step(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,4);el.textContent=Math.round(to*e);if(k<1)requestAnimationFrame(step)})(t0);
+}
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.classList.add('in');
+  setTimeout(()=>e.target.classList.add('done'),1600);
+  e.target.querySelectorAll?.('[data-count]').forEach(count);
+  io.unobserve(e.target);
+}),{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal,[data-reveal]').forEach(el=>io.observe(el));
+// stat counters start after hero intro
+if(!reduce){
+  document.querySelectorAll('.hero-bottom [data-count]').forEach(el=>el.textContent='0');
+  setTimeout(()=>document.querySelectorAll('.hero-bottom [data-count]').forEach(count),1200);
+}
+
+// scroll progress + parallax
+const bar=$('progress'),par=[...document.querySelectorAll('[data-parallax]')];
+let ticking=false;
+function onScroll(){
+  const h=document.documentElement.scrollHeight-innerHeight;
+  bar.style.transform=`scaleX(${h>0?scrollY/h:0})`;
+  if(!reduce)par.forEach(el=>{
+    const r=el.parentElement.getBoundingClientRect();
+    el.style.transform=`translateY(${(r.top+r.height/2-innerHeight/2)*-(+el.dataset.parallax)}px)`;
+  });
+  ticking=false;
+}
+addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(onScroll)}},{passive:true});
+onScroll();
+
+// mouse tilt on hero car (desktop only)
+const wrap=$('carWrap');
+if(!reduce&&matchMedia('(hover:hover) and (pointer:fine)').matches){
+  const hero=document.querySelector('.hero');
+  hero.addEventListener('mousemove',e=>{
+    const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;
+    wrap.style.transform=`translate(${x*-18}px,${y*-10}px) rotate(${x*-1.2}deg)`;
+  });
+  hero.addEventListener('mouseleave',()=>wrap.style.transform='');
+  wrap.style.transition='transform .6s cubic-bezier(.22,1,.36,1)';
+}
 
 // form (demo)
 document.getElementById('form').addEventListener('submit',e=>{
